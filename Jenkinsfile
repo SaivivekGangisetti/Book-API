@@ -6,9 +6,8 @@ pipeline {
         // ===== FRONTEND BUILD =====
         stage('Build Frontend') {
             steps {
-                dir('FRONTEND\\book-frontend') {
-                    // Clean install ensures dependencies (like axios) are installed from package.json/package-lock.json
-                    bat 'npm ci'
+                dir('FRONTEND/book-frontend') {
+                    bat 'npm install'   // ensures axios gets installed
                     bat 'npm run build'
                 }
             }
@@ -50,7 +49,6 @@ pipeline {
                 '''
             }
         }
-
     }
 
     post {
