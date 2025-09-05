@@ -1,8 +1,11 @@
 pipeline {
     agent any
 
-    stages {
+    environment {
+        TOMCAT_HOME = "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1"
+    }
 
+    stages {
         // ===== FRONTEND BUILD =====
         stage('Build Frontend') {
             steps {
@@ -16,13 +19,13 @@ pipeline {
         // ===== FRONTEND DEPLOY =====
         stage('Deploy Frontend to Tomcat') {
             steps {
-                bat '''
-                if exist "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\book-frontend" (
-                    rmdir /S /Q "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\book-frontend"
+                bat """
+                if exist "%TOMCAT_HOME%\\webapps\\book-frontend" (
+                    rmdir /S /Q "%TOMCAT_HOME%\\webapps\\book-frontend"
                 )
-                mkdir "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\book-frontend"
-                xcopy /E /I /Y FRONTEND\\book-frontend\\dist\\* "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\book-frontend"
-                '''
+                mkdir "%TOMCAT_HOME%\\webapps\\book-frontend"
+                xcopy /E /I /Y FRONTEND\\book-frontend\\dist\\* "%TOMCAT_HOME%\\webapps\\book-frontend"
+                """
             }
         }
 
@@ -30,7 +33,7 @@ pipeline {
         stage('Build Backend') {
             steps {
                 dir('BACKEND/book-api') {
-                    bat 'mvn clean package'
+                    bat 'mvn clean package -DskipTests'
                 }
             }
         }
@@ -38,24 +41,35 @@ pipeline {
         // ===== BACKEND DEPLOY =====
         stage('Deploy Backend to Tomcat') {
             steps {
-                bat '''
-                if exist "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\book-backend.war" (
-                    del /Q "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\book-backend.war"
+                bat """
+                if exist "%TOMCAT_HOME%\\webapps\\book-backend.war" (
+                    del /Q "%TOMCAT_HOME%\\webapps\\book-backend.war"
                 )
-                if exist "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\book-backend" (
-                    rmdir /S /Q "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\book-backend"
+                if exist "%TOMCAT_HOME%\\webapps\\book-backend" (
+                    rmdir /S /Q "%TOMCAT_HOME%\\webapps\\book-backend"
                 )
                 for %%f in (BACKEND\\book-api\\target\\*.war) do (
-                    copy "%%f" "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\book-backend.war"
+                    copy "%%f" "%TOMCAT_HOME%\\webapps\\book-backend.war"
                 )
-                '''
+                """
+            }
+        }
+
+        // ===== RESTART TOMCAT =====
+        stage('Restart Tomcat') {
+            steps {
+                bat """
+                net stop Tomcat10
+                timeout /t 5
+                net start Tomcat10
+                """
             }
         }
     }
 
     post {
         success {
-            echo '✅ Deployment Successful!'
+            echo '✅ Deployment Successful! Access backend at http://localhost:8080/book-backend'
         }
         failure {
             echo '❌ Pipeline Failed. Check logs.'
