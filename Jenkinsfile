@@ -6,8 +6,9 @@ pipeline {
         // ===== FRONTEND BUILD =====
         stage('Build Frontend') {
             steps {
-                dir('FRONTEND\\book-frontend') {   // ✅ escape fixed
-                    bat 'npm install'
+                dir('FRONTEND\\book-frontend') {
+                    // Clean install ensures dependencies (like axios) are installed from package.json/package-lock.json
+                    bat 'npm ci'
                     bat 'npm run build'
                 }
             }
@@ -22,7 +23,7 @@ pipeline {
                 )
                 mkdir "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\book-frontend"
                 xcopy /E /I /Y FRONTEND\\book-frontend\\dist\\* "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\book-frontend"
-                ''' // ✅ corrected path (added book-frontend before dist)
+                '''
             }
         }
 
@@ -54,10 +55,10 @@ pipeline {
 
     post {
         success {
-            echo 'Deployment Successful!'
+            echo '✅ Deployment Successful!'
         }
         failure {
-            echo 'Pipeline Failed.'
+            echo '❌ Pipeline Failed. Check logs.'
         }
     }
 }
