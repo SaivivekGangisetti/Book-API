@@ -7,7 +7,7 @@ pipeline {
         stage('Build Frontend') {
             steps {
                 dir('FRONTEND/book-frontend') {
-                    bat 'npm install'   // ensures axios gets installed
+                    bat 'npm install'
                     bat 'npm run build'
                 }
             }
@@ -29,7 +29,7 @@ pipeline {
         // ===== BACKEND BUILD =====
         stage('Build Backend') {
             steps {
-                dir('BACKEND\\book-api') {
+                dir('BACKEND/book-api') {
                     bat 'mvn clean package'
                 }
             }
@@ -45,7 +45,9 @@ pipeline {
                 if exist "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\book-backend" (
                     rmdir /S /Q "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\book-backend"
                 )
-                copy "BACKEND\\book-api\\target\\*.war" "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\"
+                for %%f in (BACKEND\\book-api\\target\\*.war) do (
+                    copy "%%f" "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\book-backend.war"
+                )
                 '''
             }
         }
