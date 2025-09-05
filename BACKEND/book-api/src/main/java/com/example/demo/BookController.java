@@ -1,0 +1,51 @@
+package com.example.demo;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/books")
+@CrossOrigin(origins = "*	") // allow Vite dev server
+public class BookController {
+
+    private final BookService service;
+
+    public BookController(BookService service) {
+        this.service = service;
+    }
+
+    @GetMapping
+    public List<Book> getAll() {
+        return service.getAllBooks();
+    }
+
+    @GetMapping("/{id}")
+    public Book getOne(@PathVariable Long id) {
+        return service.getBookById(id);
+    }
+
+    @PostMapping
+    public ResponseEntity<Book> create(@RequestBody Book book) {
+        Book created = service.createBook(book);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(created.getId())
+                .toUri();
+        return ResponseEntity.created(location).body(created);
+    }
+
+    @PutMapping("/{id}")
+    public Book update(@PathVariable Long id, @RequestBody Book book) {
+        return service.updateBook(id, book);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        service.deleteBook(id);
+        return ResponseEntity.noContent().build();
+    }
+}

@@ -1,0 +1,16 @@
+body { font-family: Arial, sans-serif; background: #f7f9fc; color: #111; }
+input, button { padding: 8px; margin: 4px 0; }
+button { cursor: pointer; }
+table th { background: #eee; text-align:left; }
+table td { padding: 8px; }
+table tr:nth-child(even) { background: #f2f2f2; }
+table tr:hover { background: #ddd; }
+a { color: #007bff; text-decoration: none; }
+a:hover { color: #0056b3; }
+h1, h2 { color: #333; }
+.container { max-width: 800px; margin: auto; padding: 20px; background: #fff; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+.error { color: red; }
+.success { color: green; }
+.form-group { margin-bottom: 15px; }
+.form-group label { display: block; margin-bottom: 5px; }
+.form-group input { width: 100%; padding: 8px; margin-bottom: 10px; }
