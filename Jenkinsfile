@@ -6,7 +6,7 @@ pipeline {
         // ===== FRONTEND BUILD =====
         stage('Build Frontend') {
             steps {
-                dir('FRONTEND\book-frontend') {
+                dir('FRONTEND\\book-frontend') {   // ✅ escape fixed
                     bat 'npm install'
                     bat 'npm run build'
                 }
@@ -21,8 +21,8 @@ pipeline {
                     rmdir /S /Q "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\book-frontend"
                 )
                 mkdir "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\book-frontend"
-                xcopy /E /I /Y FRONTEND\\dist\\* "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\book-frontend"
-                '''
+                xcopy /E /I /Y FRONTEND\\book-frontend\\dist\\* "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\book-frontend"
+                ''' // ✅ corrected path (added book-frontend before dist)
             }
         }
 
